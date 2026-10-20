@@ -1,141 +1,13 @@
-/* pour enseignant chercheur */
+/* gurvan met la partie enseignant chercheur ici */
 
-/* les requetes classiques dabord */
+prout
 
-SELECT E.IdExpe, E.NomExpe, L.NomLabo, E.DateDebExpe, E.DateFinExpe, E.Statut 
-FROM dbo.EXPERIMENTATION AS E INNER JOIN dbo.LABORATOIRE AS L ON L.IdLabo = E.IdLab 
-ORDER BY L.NomLabo, E.DateDebExpe;
-
-
-DECLARE @IdExpe INT = 1;
-SELECT
-    C.NomCreneau,
-    C.DateCreneau,
-    C.DebCreneau,
-    C.FinCreneau
-FROM dbo.CRENEAU AS C
-WHERE C.IdExpe = @IdExpe
-ORDER BY C.DateCreneau, C.DebCreneau;
-
-
-DECLARE @IdExpe INT = 1;
-SELECT
-    R.NomRess,
-    TR.NomTypeRess
-FROM dbo.RESSOURCE AS R
-INNER JOIN dbo.TYPERESSOURCE AS TR
-    ON TR.IdTypeRess = R.IdTypeRess
-WHERE R.IdExpe = @IdExpe
-ORDER BY TR.NomTypeRess, R.NomRess;
-
-/* les procedures stockees ensuite */
-
-/* permet de lister les participants d'une expérimentation avec leur statut d'inscription */
-CREATE OR ALTER PROCEDURE dbo.StatutPart_ListeParticipantsExpe
-    @IdExpe INT
-AS
-BEGIN
-    SET NOCOUNT ON;
-
-    SELECT
-        U.IdUser,
-        U.NomUser,
-        U.PrenomUser,
-        U.MailUser,
-        SI.NomStatutInscript
-    FROM dbo.PARTICIPER AS P
-    INNER JOIN dbo.USER_ AS U
-        ON U.IdUser = P.IdUser
-    INNER JOIN dbo.INSCRIPTION AS I
-        ON I.IdInscription = P.IdInscription
-    INNER JOIN dbo.STATUTINSCRIPTION AS SI
-        ON SI.IdStatutInscript = I.IdStatutInscript
-    WHERE P.IdExpe = @IdExpe
-    ORDER BY U.NomUser, U.PrenomUser;
-END;
-GO
-
-EXEC dbo.StatutPart_ListeParticipantsExpe @IdExpe = 1;
-
-/* permet de rajouter une expérimentation à un laboratoire existant */
-CREATE OR ALTER PROCEDURE dbo.SP_CreerExperimentation
-    @IdExpe INT,
-    @NomExpe VARCHAR(50),
-    @DescExpe VARCHAR(MAX),
-    @DateDebExpe DATE,
-    @DateFinExpe DATE,
-    @Statut VARCHAR(50),
-    @IdLabo INT
-AS
-BEGIN
-    SET NOCOUNT ON;
-
-    IF @DateFinExpe < @DateDebExpe
-        THROW 50001, 'La date de fin doit être posterieure ou egale a la date de debut.', 1;
-
-    IF NOT EXISTS (
-        SELECT 1
-        FROM dbo.LABORATOIRE
-        WHERE IdLabo = @IdLabo
-    )
-        THROW 50002, 'Le laboratoire indique n existe pas.', 1;
-
-    INSERT INTO dbo.EXPERIMENTATION (
-        IdExpe, NomExpe, DescExpe,
-        DateDebExpe, DateFinExpe, Statut, IdLabo
-    )
-    VALUES (
-        @IdExpe, @NomExpe, @DescExpe,
-        @DateDebExpe, @DateFinExpe, @Statut, @IdLabo
-    );
-
-    SELECT *
-    FROM dbo.EXPERIMENTATION
-    WHERE IdExpe = @IdExpe;
-END;
-GO
-
-EXEC dbo.SP_CreerExperimentation
-    @IdExpe = 11,
-    @NomExpe = 'Etude environnementale',
-    @DescExpe = 'Analyse de la qualite de l eau',
-    @DateDebExpe = '2027-01-10',
-    @DateFinExpe = '2027-02-10',
-    @Statut = 'Planifiee',
-    @IdLabo = 1;
-
-
-/* permet de modifier le statut d'une expérimentation */
-CREATE OR ALTER PROCEDURE dbo.SP_ModifierStatutExpe
-    @IdExpe INT,
-    @NouveauStatut VARCHAR(50)
-AS
-BEGIN
-    SET NOCOUNT ON;
-
-    UPDATE dbo.EXPERIMENTATION
-    SET Statut = @NouveauStatut
-    WHERE IdExpe = @IdExpe;
-
-    IF @@ROWCOUNT = 0
-        THROW 50003, 'Experimentation introuvable.', 1;
-
-    SELECT IdExpe, NomExpe, Statut
-    FROM dbo.EXPERIMENTATION
-    WHERE IdExpe = @IdExpe;
-END;
-GO
-
-
-EXEC dbo.SP_ModifierStatutExpe
-    @IdExpe = 1,
-    @NouveauStatut = 'Terminee';
 
 
 /* pour le participant */
-
 /* requêtes classiques dabord */
 
+/* permet de lister les expérimentations en cours avec le nom du laboratoire associé */
 SELECT
     E.IdExpe,
     E.NomExpe,
@@ -150,7 +22,9 @@ INNER JOIN dbo.LABORATOIRE AS L
 WHERE E.Statut = 'En cours'
 ORDER BY E.DateDebExpe;
 
+GO
 
+/* permet de lister les documents associés à une expérimentation donnée */
 DECLARE @IdExpe INT = 1;
 SELECT
     D.NomDoc,
@@ -159,7 +33,9 @@ FROM dbo.DOCUMENT AS D
 WHERE D.IdExpe = @IdExpe
 ORDER BY D.NomDoc;
 
+GO
 
+/* permet de lister les créneaux associés à une expérimentation donnée */ 
 DECLARE @IdExpe INT = 1;
 SELECT
     E.NomExpe,
@@ -173,6 +49,7 @@ INNER JOIN dbo.EXPERIMENTATION AS E
 WHERE C.IdExpe = @IdExpe
 ORDER BY C.DateCreneau, C.DebCreneau;
 
+GO
 
 /* les procédures stockées ensuite */
 
@@ -207,6 +84,7 @@ GO
 
 EXEC dbo.SP_MesExperimentations @IdUser = 1;
 
+GO
 
 /* permet de récupérer les créneaux de toutes les expérimentations auxquelles participe l'utilisateur.*/
 CREATE OR ALTER PROCEDURE dbo.SP_MonPlanning
@@ -233,6 +111,8 @@ GO
 
 EXEC dbo.SP_MonPlanning @IdUser = 1;
 
+GO
+
 /* permet de récupérer les documents de toutes les expérimentations auxquelles participe l'utilisateur.*/
 CREATE OR ALTER PROCEDURE dbo.SP_MesDocuments
     @IdUser INT
@@ -256,10 +136,12 @@ GO
 
 EXEC dbo.SP_MesDocuments @IdUser = 1;
 
-/* pour l'administrateur */ 
+GO
 
+/* pour l'administrateur */ 
 /* requêtes classiques dabord */
 
+/* permet de lister tous les utilisateurs avec leur rôle associé */
 SELECT
     U.IdUser,
     U.NomUser,
@@ -271,7 +153,8 @@ INNER JOIN dbo.ROLE AS R
     ON R.IdRole = U.IdRole
 ORDER BY R.NomRole, U.NomUser;
 
-
+GO
+/* permet de lister le nombre de ressources par type de ressource */
 SELECT
     TR.IdTypeRess,
     TR.NomTypeRess,
@@ -282,7 +165,8 @@ LEFT JOIN dbo.RESSOURCE AS R
 GROUP BY TR.IdTypeRess, TR.NomTypeRess
 ORDER BY NombreRessources DESC;
 
-
+GO
+/* permet de lister les 20 derniers logs avec leur niveau de log associé */
 SELECT TOP (20)
     L.IdLog,
     L.DateLog,
@@ -297,6 +181,7 @@ ORDER BY
     L.TimeLog DESC,
     L.IdLog DESC;
 
+GO
 
 /* les procédures stockées ensuite */
 
@@ -328,6 +213,7 @@ GO
 
 EXEC dbo.SP_StatistiquesPlateforme;
 
+GO
 
 /* permet de rechercher les logs par niveau de log */
 CREATE OR ALTER PROCEDURE dbo.SP_RechercherLogs
@@ -352,6 +238,7 @@ GO
 
 EXEC dbo.SP_RechercherLogs @IdLogLevel = 1;
 
+GO
 
 /* permet de récupérer le nombre d'utilisateurs par rôle */
 CREATE OR ALTER PROCEDURE dbo.SP_UtilisateursParRole
@@ -372,3 +259,5 @@ END;
 GO
 
 EXEC dbo.SP_UtilisateursParRole;
+
+GO
