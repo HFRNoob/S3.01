@@ -1,0 +1,162 @@
+CREATE TABLE ROLE(
+   IdRole INT,
+   NomRole VARCHAR(50) NOT NULL,
+   DescRole TEXT,
+   PRIMARY KEY(IdRole),
+   UNIQUE(NomRole)
+);
+
+CREATE TABLE LABORATOIRE(
+   IdLabo INT,
+   NomLabo VARCHAR(50) NOT NULL,
+   PRIMARY KEY(IdLabo)
+);
+
+CREATE TABLE STATUTINSCRIPTION(
+   IdStatutInscript INT,
+   NomStatutInscript VARCHAR(50) NOT NULL,
+   PRIMARY KEY(IdStatutInscript)
+);
+
+CREATE TABLE CONTRAINTE(
+   IdCont INT,
+   NomCont VARCHAR(50) NOT NULL,
+   DescCont TEXT,
+   PRIMARY KEY(IdCont)
+);
+
+CREATE TABLE TYPERESSOURCE(
+   IdTypeRess INT,
+   NomTypeRess VARCHAR(50) NOT NULL,
+   PRIMARY KEY(IdTypeRess),
+   UNIQUE(NomTypeRess)
+);
+
+CREATE TABLE MESSAGERIE(
+   IdMessage INT,
+   CorpsMsg TEXT NOT NULL,
+   DateEnvoi DATETIME NOT NULL,
+   PRIMARY KEY(IdMessage)
+);
+
+CREATE TABLE LOGLEVEL(
+   IdLogLevel INT,
+   NameLogLevel VARCHAR(50) NOT NULL,
+   PRIMARY KEY(IdLogLevel),
+   UNIQUE(NameLogLevel)
+);
+
+CREATE TABLE USER_(
+   IdUser INT,
+   NomUser VARCHAR(50) NOT NULL,
+   PrenomUser VARCHAR(50) NOT NULL,
+   BirthUser DATE NOT NULL,
+   GenderUser VARCHAR(50) NOT NULL,
+   MailUser VARCHAR(200) NOT NULL,
+   IdRole INT NOT NULL,
+   PRIMARY KEY(IdUser),
+   UNIQUE(MailUser),
+   FOREIGN KEY(IdRole) REFERENCES ROLE(IdRole)
+);
+
+CREATE TABLE EXPERIMENTATION(
+   IdExpe INT,
+   NomExpe VARCHAR(50) NOT NULL,
+   DescExpe TEXT,
+   DateDebExpe DATE NOT NULL,
+   DateFinExpe DATE NOT NULL,
+   Statut VARCHAR(50) NOT NULL,
+   IdLabo INT NOT NULL,
+   PRIMARY KEY(IdExpe),
+   FOREIGN KEY(IdLabo) REFERENCES LABORATOIRE(IdLabo)
+);
+
+CREATE TABLE CRENEAU(
+   IdCreneau INT,
+   NomCreneau VARCHAR(50) NOT NULL,
+   DateCreneau DATE NOT NULL,
+   DebCreneau TIME NOT NULL,
+   FinCreneau TIME NOT NULL,
+   IdExpe INT NOT NULL,
+   PRIMARY KEY(IdCreneau),
+   FOREIGN KEY(IdExpe) REFERENCES EXPERIMENTATION(IdExpe)
+);
+
+CREATE TABLE INSCRIPTION(
+   IdInscription INT,
+   ConscentInscription BYTE NOT NULL,
+   IdStatutInscript INT NOT NULL,
+   PRIMARY KEY(IdInscription),
+   FOREIGN KEY(IdStatutInscript) REFERENCES STATUTINSCRIPTION(IdStatutInscript)
+);
+
+CREATE TABLE TEAM(
+   IdTeam INT,
+   NameTeam VARCHAR(50) NOT NULL,
+   IdExpe INT NOT NULL,
+   PRIMARY KEY(IdTeam),
+   UNIQUE(NameTeam),
+   FOREIGN KEY(IdExpe) REFERENCES EXPERIMENTATION(IdExpe)
+);
+
+CREATE TABLE RESSOURCE(
+   IdRess INT,
+   NomRess VARCHAR(50) NOT NULL,
+   IdTypeRess INT NOT NULL,
+   IdExpe INT NOT NULL,
+   PRIMARY KEY(IdRess),
+   FOREIGN KEY(IdTypeRess) REFERENCES TYPERESSOURCE(IdTypeRess),
+   FOREIGN KEY(IdExpe) REFERENCES EXPERIMENTATION(IdExpe)
+);
+
+CREATE TABLE DOCUMENT(
+   IdDoc INT,
+   UrlDoc VARCHAR(500) NOT NULL,
+   NomDoc VARCHAR(200) NOT NULL,
+   IdExpe INT NOT NULL,
+   PRIMARY KEY(IdDoc),
+   UNIQUE(UrlDoc),
+   FOREIGN KEY(IdExpe) REFERENCES EXPERIMENTATION(IdExpe)
+);
+
+CREATE TABLE LOG(
+   IdLog INT,
+   DateLog DATE,
+   TimeLog TIME NOT NULL,
+   CorpsLog TEXT NOT NULL,
+   IdLogLevel INT NOT NULL,
+   PRIMARY KEY(IdLog),
+   FOREIGN KEY(IdLogLevel) REFERENCES LOGLEVEL(IdLogLevel)
+);
+
+CREATE TABLE Asso_2(
+   IdUser INT,
+   IdCont INT,
+   PRIMARY KEY(IdUser, IdCont),
+   FOREIGN KEY(IdUser) REFERENCES USER_(IdUser),
+   FOREIGN KEY(IdCont) REFERENCES CONTRAINTE(IdCont)
+);
+
+CREATE TABLE Asso_5(
+   IdUser INT,
+   IdExpe INT,
+   PRIMARY KEY(IdUser, IdExpe),
+   FOREIGN KEY(IdUser) REFERENCES USER_(IdUser),
+   FOREIGN KEY(IdExpe) REFERENCES EXPERIMENTATION(IdExpe)
+);
+
+CREATE TABLE Asso_12(
+   IdExpe INT,
+   IdInscription INT,
+   PRIMARY KEY(IdExpe, IdInscription),
+   FOREIGN KEY(IdExpe) REFERENCES EXPERIMENTATION(IdExpe),
+   FOREIGN KEY(IdInscription) REFERENCES INSCRIPTION(IdInscription)
+);
+
+CREATE TABLE Asso_15(
+   IdUser INT,
+   IdMessage INT,
+   PRIMARY KEY(IdUser, IdMessage),
+   FOREIGN KEY(IdUser) REFERENCES USER_(IdUser),
+   FOREIGN KEY(IdMessage) REFERENCES MESSAGERIE(IdMessage)
+);
