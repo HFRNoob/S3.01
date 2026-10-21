@@ -316,7 +316,7 @@ BEGIN
 END;
 GO
 
-EXEC dbo.SP_MesExperimentations @IdUser = 1;
+EXEC dbo.SP_MesExperimentations @IdUser = 6;
 
 GO
 
@@ -343,7 +343,7 @@ BEGIN
 END;
 GO
 
-EXEC dbo.SP_MonPlanning @IdUser = 1;
+EXEC dbo.SP_MonPlanning @IdUser = 6;
 
 GO
 
@@ -368,7 +368,7 @@ BEGIN
 END;
 GO
 
-EXEC dbo.SP_MesDocuments @IdUser = 1;
+EXEC dbo.SP_MesDocuments @IdUser = 6;
 
 GO
 
