@@ -9,3 +9,5 @@ Objectifs d'utilisation :
 - Création des insert pour les tables de liaison comme INSCRIPTION et PARTICIPER : Sonnet 5.5
 - Création de la 3eme requête select de l'enseignant-chercheur à partir des deux précédentes : Sonnet 5.5
 - Correction des procédures stockées de l'enseignant-chercheur et rédaction des exécutions : Sonnet 5.5
+- Correction d'erreurs de contraintes lors de la création du fichier d'insertion des données : GPT 5 Luna
+- Génération de situations d'utilisations de la base de données en fonction du contexte : GPT 5 Luna
