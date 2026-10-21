@@ -11,3 +11,6 @@ Objectifs d'utilisation :
 - Correction des procédures stockées de l'enseignant-chercheur et rédaction des exécutions : Sonnet 5.5
 - Correction d'erreurs de contraintes lors de la création du fichier d'insertion des données : GPT 5 Luna
 - Génération de situations d'utilisations de la base de données en fonction du contexte : GPT 5 Luna
+- Debug générique lorsque l'erreur prenait plus que 1m30 à être corrigée
+
+(Ce fichier a été écrit par des humains)
