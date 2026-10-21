@@ -83,6 +83,9 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM LABORATOIRE WHERE IdLabo = @IdLabo)
         THROW 50004, N'Le laboratoire n''existe pas.', 1;
 
+	IF EXISTS (SELECT 1 FROM EXPERIMENTATION WHERE NomExpe = @NomExpe)
+		THROW 50005, N'Une expérimentation possède déja ce nom',1;
+
     -- Création
     BEGIN TRY
         BEGIN TRANSACTION;
